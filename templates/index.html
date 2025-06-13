@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wasooli - Student Search</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .glass-effect-strong {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+        .table-row-hover:hover {
+            background-color: rgba(255, 255, 255, 0.4) !important;
+        }
+        .search-box:focus {
+            box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.5);
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="max-w-6xl mx-auto p-6 rounded-xl glass-effect">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-6 mb-8">
+            <div class="flex flex-col items-center">
+                <div class="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center bg-white mb-2">
+                    <img src="/static/logo.png" alt="Wasooli Logo" class="w-full h-full object-contain p-2">
+                </div>
+                <span class="text-blue-700 font-semibold">Wasooli</span>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold text-blue-800">Student Search</h1>
+                <p class="text-gray-600 italic">Developed by Muneeb Ur Rehman</p>
+            </div>
+        </div>
+        
+        <div class="mb-8">
+            <div class="relative mb-6">
+                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"><i class="fas fa-search"></i></span>
+                <input type="text" id="searchAll" placeholder="Search All..." class="w-full py-3 pl-10 pr-4 rounded-lg glass-effect-strong search-box transition-all duration-300">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"><i class="fas fa-users"></i></span>
+                    <select id="searchClass" class="w-full py-2 pl-10 pr-4 rounded-lg glass-effect-strong search-box appearance-none">
+                        <option value="">All Classes</option>
+                        </select>
+                    <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"><i class="fas fa-chevron-down"></i></span>
+                </div>
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"><i class="fas fa-info-circle"></i></span>
+                    <select id="searchStatus" class="w-full py-2 pl-10 pr-4 rounded-lg glass-effect-strong search-box appearance-none">
+                        <option value="">All Statuses</option>
+                        </select>
+                    <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"><i class="fas fa-chevron-down"></i></span>
+                </div>
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"><i class="fas fa-id-card"></i></span>
+                    <input type="text" id="searchIdName" placeholder="ID or Name..." class="w-full py-2 pl-10 pr-4 rounded-lg glass-effect-strong search-box">
+                </div>
+            </div>
+        </div>
+        
+        <div class="rounded-xl overflow-hidden glass-effect-strong">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 divide-opacity-30">
+                    <thead class="bg-blue-500 bg-opacity-20 text-blue-800">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Class</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Admission Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTable" class="divide-y divide-gray-200 divide-opacity-10">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="mt-6 text-center text-sm text-gray-600 italic">
+             © 2025 Wasooli Student Search System
+        </div>
+    </div>
+
+    <script>
+        // --- Function to populate the table ---
+        function populateTable(students) {
+            const tableBody = document.getElementById('resultsTable');
+            tableBody.innerHTML = ''; 
+
+            if (!students || students.length === 0) {
+                 tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 px-6 text-gray-600">No matching records found.</td></tr>';
+                 return;
+            }
+
+            students.forEach(student => {
+                const row = document.createElement('tr');
+                const status = student.status || 'N/A';
+                row.className = `glass-effect table-row-hover`;
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-900 font-medium">${student.id || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${student.name || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${student.class || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 text-xs rounded-full ${status.toLowerCase() === 'active' ? 'bg-green-100 text-green-800' : 
+                                       status.toLowerCase() === 'inactive' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}">
+                            ${status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${student.admissiondts || 'N/A'}</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        // --- NEW: Function to populate filter dropdowns ---
+        async function populateFilterDropdowns() {
+            try {
+                const response = await fetch('/api/filters');
+                if (!response.ok) throw new Error('Failed to fetch filter options');
+                const filters = await response.json();
+
+                // Populate Classes dropdown
+                const classSelect = document.getElementById('searchClass');
+                filters.classes.forEach(cls => {
+                    const option = document.createElement('option');
+                    option.value = cls;
+                    option.textContent = cls;
+                    classSelect.appendChild(option);
+                });
+
+                // Populate Statuses dropdown
+                const statusSelect = document.getElementById('searchStatus');
+                // Clear any hardcoded statuses first
+                statusSelect.innerHTML = '<option value="">All Statuses</option>'; 
+                filters.statuses.forEach(status => {
+                    const option = document.createElement('option');
+                    option.value = status;
+                    option.textContent = status;
+                    statusSelect.appendChild(option);
+                });
+
+            } catch (error) {
+                console.error("Error populating filters:", error);
+            }
+        }
+        
+        // --- Function to fetch filtered data from the backend ---
+        async function fetchFilteredStudents() {
+            const searchAll = document.getElementById('searchAll').value;
+            const searchClass = document.getElementById('searchClass').value;
+            const searchStatus = document.getElementById('searchStatus').value;
+            const searchIdName = document.getElementById('searchIdName').value;
+
+            const queryParams = new URLSearchParams({ searchAll, searchClass, searchStatus, searchIdName });
+
+            try {
+                const response = await fetch(`/api/data?${queryParams.toString()}`);
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                const data = await response.json();
+                populateTable(data);
+            } catch (error) {
+                console.error("Failed to fetch student data:", error);
+                document.getElementById('resultsTable').innerHTML = `<tr><td colspan="5" class="text-center py-4 px-6 text-red-600">Error loading data.</td></tr>`;
+            }
+        }
+
+        // --- Add event listeners to all search inputs ---
+        document.getElementById('searchAll').addEventListener('input', fetchFilteredStudents);
+        document.getElementById('searchClass').addEventListener('change', fetchFilteredStudents);
+        document.getElementById('searchStatus').addEventListener('change', fetchFilteredStudents);
+        document.getElementById('searchIdName').addEventListener('input', fetchFilteredStudents);
+
+        // --- Initial page load sequence ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            await populateFilterDropdowns(); 
+            fetchFilteredStudents();     
+        });
+    </script>
+</body>
+</html>
