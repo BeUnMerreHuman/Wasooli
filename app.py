@@ -4,13 +4,10 @@ import requests
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 
-# --- Initialize Flask App ---
 app = Flask(__name__, static_folder="static", template_folder="templates")
 CORS(app)
 
-# --- Fetch Data from API ---
 def fetch_data(url="https://sms.ilmwasooli.com/temp/gettestingdata"):
-    """Fetches data from the specified URL and returns it as a Pandas DataFrame."""
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
