@@ -60,6 +60,9 @@ https://sms.ilmwasooli.com/temp/gettestingdata
 
 The app is deployed on Render using the render.yaml configuration.
 
+## License
+This project is licensed under the [MIT License](LICENSE).
+
 ## Author
 - Muneeb Ur Rehman Siddiqui
 - Email: muneeburrehmansiddiqui98@gmail.com
